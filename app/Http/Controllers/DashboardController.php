@@ -15,23 +15,17 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         $dynamoUser = DynamoUser::findByEmail($user->email);
-
-
-        //dd($dynamoUser);
-
+        $music = DynamoMusic::showAllMusic();
+        
         return Inertia::render('Dashboard',[
+            'auth' => [
+                'user' => ['user_name' => $user->user_name, 'email' => $user->email],
+            ],            
             'user' => $user->user_name,
             'email' => $user->email,
-            'subscriptions' => $user->subscriptions,
-        ]);
-    }
-    public function showAllMusic()
-    {
-        $music = DynamoMusic::showAllMusic();
-
-        return Inertia::render('Dashboard', [
             'music' => $music,
         ]);
     }
+
 
 }

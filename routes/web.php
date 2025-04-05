@@ -24,16 +24,8 @@ Route::post('unsubscribe',
     [\App\Http\Controllers\MusicController::class, 'unsubscribe']
 )->middleware(['auth'])->name('unsubscribe');
 
-//Route::get('/dashboard',
-//    [MusicController::class, 'dashboard']
-//)->middleware(['auth', 'verified'])->name('dashboard');
-//Route::get('/subscription',
-//    [MusicController::class, 'subscription']
-//)->middleware(['auth'])->name('subscription');
-
 
 Route::get('/subscription', [MusicController::class, 'subscription'])->middleware(['auth'])->name('subscription');
-Route::get('/dashboard', [MusicController::class, 'dashboard'])->middleware(['auth'])->name('dashboard');
 
 
 require __DIR__.'/settings.php';

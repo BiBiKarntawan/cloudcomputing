@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'dynamodb'),
 
     /*
     |--------------------------------------------------------------------------
@@ -30,6 +30,14 @@ return [
     */
 
     'connections' => [
+
+        'dynamodb' => [
+            'driver'   => 'dynamodb',
+            'key'      => env('AWS_ACCESS_KEY_ID'),
+            'secret'   => env('AWS_SECRET_ACCESS_KEY'),
+            'region'   => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'table'    => env('AWS_DYNAMODB_TABLE', 'your_table_name'),
+        ],
 
         'sqlite' => [
             'driver' => 'sqlite',
