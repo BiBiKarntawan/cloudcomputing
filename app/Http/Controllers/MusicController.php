@@ -48,4 +48,8 @@ class MusicController extends Controller
         return to_route('subscription');
 
     }
+
+    public function query(Request $request){
+    dd ($request);
+    }
 }

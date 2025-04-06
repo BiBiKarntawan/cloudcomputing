@@ -26,6 +26,7 @@ class DashboardController extends Controller
             'music' => $music,
         ]);
     }
+    
 
 
 }
