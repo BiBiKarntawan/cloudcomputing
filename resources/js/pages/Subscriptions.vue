@@ -12,8 +12,11 @@ interface SubscriptionItem {
 }
 
 interface Props {
-    subscriptions: SubscriptionItem[];
+    auth: object;
     user: string;
+    email: string;
+    subscriptions: SubscriptionItem[];
+    // user: User;
 }
 
 const props = defineProps<Props>();
@@ -38,7 +41,7 @@ const unsubscribe = (song: MusicItem) => {
 
     <AppLayout>
         <div class="p-6">
-            <h1 class="mb-4 text-2xl font-bold">Hi {{ props.user }}, your subscriptions:</h1>
+            <h1 class="mb-4 text-2xl font-bold">Manage your subscriptions:</h1>
 
             <div v-if="props.subscriptions.length > 0" class="grid gap-4 md:grid-cols-3">
                 <div v-for="(item, index) in props.subscriptions" :key="index" class="rounded-xl border p-4 shadow">

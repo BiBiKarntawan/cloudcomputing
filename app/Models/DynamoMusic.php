@@ -72,7 +72,7 @@ class DynamoMusic
             $user = new DynamoUser($data);
 
             return $user;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }

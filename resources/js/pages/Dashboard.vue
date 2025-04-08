@@ -54,7 +54,7 @@ const subscribe = (song: MusicItem) => {
         },
         onError: () => {
             alert(`Failed to subscribe to ${song.title}`);
-        }
+        },
     });
 };
 
@@ -96,7 +96,7 @@ const submit = () => {
     <AppLayout>
         <div class="p-4">
             <!-- <h1 class="ext-2xl font-bold">Welcome, {{ props.user }}</h1> -->
-            <h1 class="text-2xl font-bold mb-4">Discoveries</h1>
+            <h1 class="mb-4 text-2xl font-bold">Discoveries</h1>
             <div class="mb-6 rounded-lg p-6 shadow-lg">
                 <div>
                     <h1 class="mb-3 text-3xl font-semibold">Search Your Favorite Music</h1>
