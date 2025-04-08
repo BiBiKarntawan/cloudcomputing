@@ -50,6 +50,43 @@ class MusicController extends Controller
     }
 
     public function query(Request $request){
-    dd ($request);
+        //dd ($request);
+        $title = $request->title;
+        $album = $request->album;
+        $artist = $request->artist;
+        $year = $request->year;
+
+        $results = DynamoMusic::query($title, $album, $artist, $year) ?? [];
+
+        $user = Auth::user();
+        $email = $user->email;
+        $dynamoUser = DynamoUser::findByEmail($email);
+        $subscriptions = $dynamoUser->subscriptions ?? [];
+
+        foreach ($results as &$item) {
+            $isSubscribed = false;
+            foreach ($subscriptions as $sub) {
+                if (isset($sub['title']) && isset($sub['album']) && 
+                    $sub['title'] === $item['title'] && $sub['album'] === $item['album']) {
+                    $isSubscribed = true;
+                    break;
+                }
+            }
+            
+            $item['is_subscribed'] = $isSubscribed;
+        }
+
+        return Inertia::render('SearchResults', [
+            'auth' => [
+                'user' => ['user_name' => $user->user_name, 'email' => $user->email],
+            ],
+            'results' => $results,
+            'search_params' => [
+                'title' => $title ?? '',
+                'album' => $album ?? '',
+                'artist' => $artist ?? '',
+                'year' => $year ?? '',
+            ],
+        ]);
     }
 }

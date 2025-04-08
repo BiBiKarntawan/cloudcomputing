@@ -37,7 +37,7 @@ class RegisteredUserController extends Controller
         $user = DynamoUser::createItem([
             'user_name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password,
+            'password' => make($request->password),
         ]);
         //Auth::login($user);
         return to_route('login');

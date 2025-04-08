@@ -38,6 +38,7 @@ class DynamoMusic
 
         return new self($marshaler->unmarshalItem($response['Item']));
     }
+    
     public static function showAllMusic()
     {
         $client = self::getDynamoDbClient();
@@ -162,6 +163,64 @@ class DynamoMusic
         }
 
         return true;
+    }
+
+    public static function query($title = null, $album = null, $artist = null, $year = null)
+    {
+
+        $client = self::getDynamoDbClient();
+        $marshaler = new Marshaler();
+        
+        $filterExpressions = [];
+        $expressionAttributeValues = [];
+        $expressionAttributeNames = [];
+        
+        if ($title !== null) {
+            $filterExpressions[] = 'contains(title, :title)';
+            $expressionAttributeValues[':title'] = ['S' => $title];
+        }
+        
+        if ($album !== null) {
+            $filterExpressions[] = 'contains(album, :album)';
+            $expressionAttributeValues[':album'] = ['S' => $album];
+        }
+        
+        if ($artist !== null) {
+            $filterExpressions[] = 'contains(artist, :artist)';
+            $expressionAttributeValues[':artist'] = ['S' => $artist];
+        }
+        
+        if ($year !== null) {
+            $filterExpressions[] = 'contains(#year, :year)';
+            $expressionAttributeNames['#year'] = 'year';
+            $expressionAttributeValues[':year'] = ['S' => $year];
+        }
+        
+        $params = [
+            'TableName' => 'music',
+        ];
+        
+        if (!empty($filterExpressions)) {
+            $params['FilterExpression'] = implode(' AND ', $filterExpressions);
+            $params['ExpressionAttributeValues'] = $expressionAttributeValues;
+            
+            if (!empty($expressionAttributeNames)) {
+                $params['ExpressionAttributeNames'] = $expressionAttributeNames;
+            }
+        }
+        
+        try {
+            $result = $client->scan($params);
+            
+            $items = [];
+            foreach ($result['Items'] as $item) {
+                $items[] = $marshaler->unmarshalItem($item);
+            }
+            
+            return $items;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }
 
