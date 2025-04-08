@@ -84,7 +84,11 @@ const submit = () => {
     <Head title="Dashboard" />
     <AppLayout>
         <div class="p-4">
+<<<<<<< Updated upstream
             <!-- <h1 class="ext-2xl font-bold">Welcome, {{ props.user }}</h1> -->
+=======
+            <h1 class="text-2xl font-bold mb-4">Discoveries</h1>
+>>>>>>> Stashed changes
 
             <div class="mb-6 rounded-lg p-6 shadow-lg">
                 <div>
