@@ -117,6 +117,10 @@ const submit = () => {
                 </form>
             </div>
 
+            <div v-if="props.music && props.music.length === 0" class="mb-6 rounded-lg p-6 text-center shadow-lg">
+                <p class="text-lg font-medium text-yellow-800">No result is retrieved. Please query again.</p>
+            </div>
+
             <div class="grid gap-4 md:grid-cols-3">
                 <div v-for="(song, index) in props.music" :key="index" class="rounded-xl border p-4 shadow">
                     <img v-if="song.img_url" :src="song.img_url" alt="Cover" class="mb-2 h-40 w-full rounded object-cover" />
