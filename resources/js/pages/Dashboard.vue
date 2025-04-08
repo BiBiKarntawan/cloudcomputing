@@ -33,8 +33,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const subscribe = (song: MusicItem) => {
-    //alert(song.title)
-
+    // //alert(song.title)
+    // if (props.subscriptions.includes(song.title)) {
+    //     alert('Music has already been added.');
+    //     return;
+    // }
     const data = {
         title: song.title,
         album: song.album,
@@ -44,7 +47,15 @@ const subscribe = (song: MusicItem) => {
     };
 
     // Posting data using Inertia's post method
-    router.post('/subscribe', data);
+    // router.post('/subscribe', data);
+    router.post('/subscribe', data, {
+        onSuccess: () => {
+            alert(`${song.title} subscribed successfully!`);
+        },
+        onError: () => {
+            alert(`Failed to subscribe to ${song.title}`);
+        }
+    });
 };
 
 const form = useForm({
@@ -84,12 +95,8 @@ const submit = () => {
     <Head title="Dashboard" />
     <AppLayout>
         <div class="p-4">
-<<<<<<< Updated upstream
             <!-- <h1 class="ext-2xl font-bold">Welcome, {{ props.user }}</h1> -->
-=======
             <h1 class="text-2xl font-bold mb-4">Discoveries</h1>
->>>>>>> Stashed changes
-
             <div class="mb-6 rounded-lg p-6 shadow-lg">
                 <div>
                     <h1 class="mb-3 text-3xl font-semibold">Search Your Favorite Music</h1>

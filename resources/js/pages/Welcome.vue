@@ -7,7 +7,7 @@ import { Head, Link } from '@inertiajs/vue3';
         <link rel="preconnect" href="https://rsms.me/" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="preconnect" href="https://fonts.gstatic.com"  />
         <link href="https://fonts.googleapis.com/css2?family=Sonsie+One&display=swap" rel="stylesheet" />
     </Head>
     <div class="flex min-h-screen flex-col items-center bg-yellow-400 p-6 text-[#1b1b18] dark:bg-[#0a0a0a] lg:justify-center lg:p-8">
@@ -21,6 +21,7 @@ import { Head, Link } from '@inertiajs/vue3';
                 >
                     Dashboard
                 </Link>
+
                 <template v-else>
                     <Link
                         :href="route('login')"
