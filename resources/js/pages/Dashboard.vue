@@ -72,7 +72,7 @@ const checkInput = () => {
         isSubmitAllowed.value = true;
         return;
     }
-    if (form.year.trim() !== '') {
+    if (form.year !== '') {
         isSubmitAllowed.value = true;
         return;
     }
