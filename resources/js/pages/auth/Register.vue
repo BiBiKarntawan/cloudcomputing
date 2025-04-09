@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import axios from 'axios';
 import { LoaderCircle } from 'lucide-vue-next';
 
 const form = useForm({
@@ -16,37 +17,89 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-        onError: (errors) => {
-            if (errors.email) {
-                alert(errors.email); // ✅ Shows error on UI
+    // form.post(route('register'), {
+    //     onFinish: () => form.reset('password', 'password_confirmation'),
+    //     onError: (errors) => {
+    //         if (errors.email) {
+    //             alert(errors.email); // ✅ Shows error on UI
+    //         }
+    //     },
+    // });
+    axios
+        .post(
+            'https://a2vwrk4t8f.execute-api.us-east-1.amazonaws.com/default/myMusicLambdaFunction/registration',
+            form.data(), // Gets the current form data
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+            },
+        )
+        .then((response) => {
+            // Check if we have a 303 redirect status code
+            if (response.data.statusCode === 303) {
+                // window.location.href = response.headers.location;
+                window.location.href = '/login';
+            } else {
+                if (response.data && response.data.statusCode === 422) {
+                    const validationErrors = response.data.errors || {};
+
+                    // Set form errors for each field
+                    Object.keys(validationErrors).forEach((field) => {
+                        form.setError(field, Array.isArray(validationErrors[field]) ? validationErrors[field][0] : validationErrors[field]);
+                    });
+                }
+                // Handle normal success
+                form.reset('password', 'password_confirmation');
+                // Redirect to login page
+                console.log(response);
             }
-        },
-    });
+        })
+        .catch((error) => {
+            console.error('Registration error:', error);
+        })
+        .finally(() => {
+            // Always execute this code after request completes (success or error)
+            form.processing = false; // Reset the processing state if you're tracking it
+        });
 };
 </script>
 
 <template>
     <!-- ✅ Background applied directly here -->
-    <div class="bg-yellow-400 min-h-screen flex items-center justify-center">
-        <AuthBase class="bg-yellow-400"
-            title="Create an account"
-            description="Enter your details below to create your account"
-        >
+    <div class="flex min-h-screen items-center justify-center bg-yellow-400">
+        <AuthBase class="bg-yellow-400" title="Create an account" description="Enter your details below to create your account">
             <Head title="Register" />
 
             <form @submit.prevent="submit" class="flex flex-col gap-6">
                 <div class="grid gap-6">
                     <div class="grid gap-2">
                         <Label for="name">Name</Label>
-                        <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
+                        <Input
+                            id="name"
+                            type="text"
+                            required
+                            autofocus
+                            :tabindex="1"
+                            autocomplete="name"
+                            v-model="form.name"
+                            placeholder="Full name"
+                        />
                         <InputError :message="form.errors.name" />
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="email">Email address</Label>
-                        <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
+                        <Input
+                            id="email"
+                            type="email"
+                            required
+                            :tabindex="2"
+                            autocomplete="email"
+                            v-model="form.email"
+                            placeholder="email@example.com"
+                        />
                         <InputError :message="form.errors.email" />
                     </div>
 

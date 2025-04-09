@@ -2,13 +2,14 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Auth, type BreadcrumbItem } from '@/types';
+import { Head, useForm } from '@inertiajs/vue3';
+import axios from 'axios';
 import { Search } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 interface Props {
-    auth: object;
+    auth: Auth;
     user: string;
     email: string;
     subscriptions: string[];
@@ -33,29 +34,45 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const subscribe = (song: MusicItem) => {
-    // //alert(song.title)
-    // if (props.subscriptions.includes(song.title)) {
-    //     alert('Music has already been added.');
-    //     return;
-    // }
     const data = {
         title: song.title,
         album: song.album,
         year: song.year,
         img_url: song.img_url,
         artist: song.artist,
+        email: props.auth.user.email,
     };
 
-    // Posting data using Inertia's post method
-    // router.post('/subscribe', data);
-    router.post('/subscribe', data, {
-        onSuccess: () => {
-            alert(`${song.title} subscribed successfully!`);
-        },
-        onError: () => {
-            alert(`Failed to subscribe to ${song.title}`);
-        },
-    });
+    // router.post('/subscribe', data, {
+    //     onSuccess: () => {
+    //         alert(`${song.title} subscribed successfully!`);
+    //     },
+    //     onError: () => {
+    //         alert(`Failed to subscribe to ${song.title}`);
+    //     },
+    // });
+
+    axios
+        .put(
+            'https://a2vwrk4t8f.execute-api.us-east-1.amazonaws.com/default/myMusicLambdaFunction/subscribe',
+            data, // Gets the current data
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+            },
+        )
+        .then((response) => {
+            //subscribe
+            console.log(response);
+
+            alert('Subscribe successfully.');
+        })
+        .catch((error) => {
+            console.error('Subscribe error:', error);
+            alert('Subscribe error.');
+        });
 };
 
 const form = useForm({

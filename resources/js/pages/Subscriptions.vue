@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { MusicItem } from '@/pages/Dashboard.vue';
+import { Auth } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
+import axios from 'axios';
 
 interface SubscriptionItem {
     title: string;
@@ -12,7 +14,7 @@ interface SubscriptionItem {
 }
 
 interface Props {
-    auth: object;
+    auth: Auth;
     user: string;
     email: string;
     subscriptions: SubscriptionItem[];
@@ -29,10 +31,34 @@ const unsubscribe = (song: MusicItem) => {
         year: song.year,
         img_url: song.img_url,
         artist: song.artist,
+        email: props.auth.user.email,
     };
 
     // Posting data using Inertia's post method
-    router.post('/unsubscribe', data);
+    // router.post('/unsubscribe', data);
+
+    axios
+        .put(
+            'https://a2vwrk4t8f.execute-api.us-east-1.amazonaws.com/default/myMusicLambdaFunction/unsubscribe',
+            data, // Gets the current data
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+            },
+        )
+        .then((response) => {
+            //subscribe
+            console.log(response);
+
+            alert('Unsubscribe successfully.');
+            router.get(route('subscription'));
+        })
+        .catch((error) => {
+            console.error('Unsubscribe error:', error);
+            alert('Unsubscribe error.');
+        });
 };
 </script>
 
