@@ -17,12 +17,12 @@ class DynamoUserProvider implements UserProvider
 
     public function retrieveByToken($identifier, $token)
     {
-        return null; // Implement if needed
+        return null; 
     }
 
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        return null; // Implement if needed
+        return null; 
     }
 
     public function retrieveByCredentials(array $credentials)

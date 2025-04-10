@@ -15,13 +15,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 
 
-
-
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Show the login page.
-     */
+    // show the login page
     public function create(Request $request): Response
     {
         return Inertia::render('auth/Login', [
@@ -30,9 +26,7 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
+    // handle an incoming authentication request
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
@@ -42,9 +36,8 @@ class AuthenticatedSessionController extends Controller
         return redirect()->intended(route('dashboard', absolute: false));
 
     }
-    /**
-     * Destroy an authenticated session.
-     */
+    
+    // destory the authenticated
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();

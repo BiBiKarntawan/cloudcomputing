@@ -71,7 +71,6 @@ class DynamoUser implements Authenticatable
         }
     }
 
-    // Methods required by Authenticatable interface
     public function getAuthIdentifierName()
     {
         return 'email';
