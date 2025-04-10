@@ -77,7 +77,6 @@ class DynamoMusic
         }
     }
 
-    // Methods required by Authenticatable interface
     public function getAuthIdentifierName()
     {
         return 'email';
@@ -131,7 +130,6 @@ class DynamoMusic
             $client = DynamoUser::getDynamoDbClient();
             $marshaler = new Marshaler();
 
-            // Step 1: Get the current subscriptions
             $result = $client->getItem([
                 'TableName' => 'Login',
                 'Key' => $marshaler->marshalItem(['email' => $email]),
@@ -144,18 +142,16 @@ class DynamoMusic
             $user = $marshaler->unmarshalItem($result['Item']);
             $subscriptions = $user['subscriptions'] ?? [];
 
-            // Step 2: Filter out the item to remove
             $updatedSubscriptions = array_filter($subscriptions, function ($sub) use ($title, $album) {
                 return !($sub['title'] === $title && $sub['album'] === $album);
             });
 
-            // Step 3: Update the DynamoDB item
             $client->updateItem([
                 'TableName' => 'Login',
                 'Key' => $marshaler->marshalItem(['email' => $email]),
                 'UpdateExpression' => 'SET subscriptions = :subs',
                 'ExpressionAttributeValues' => $marshaler->marshalItem([
-                    ':subs' => array_values($updatedSubscriptions) // Reindex array
+                    ':subs' => array_values($updatedSubscriptions) 
                 ]),
             ]);
         } catch (Exception $e) {

@@ -12,7 +12,25 @@ use Inertia\Inertia;
 class MusicController extends Controller
 {
 
-    
+    public function index(){
+
+        $user = auth()->user();
+
+        $dynamoUser = DynamoUser::findByEmail($user->email);
+        $music = DynamoMusic::showAllMusic();
+        $subscriptions = $dynamoUser->subscriptions ?? [];
+        
+        return Inertia::render('Dashboard',[
+            'auth' => [
+                'user' => ['user_name' => $user->user_name, 'email' => $user->email],
+            ],            
+            'user' => $user->user_name,
+            'email' => $user->email,
+            'music' => $music,
+            'subscriptions_list' => $subscriptions,
+        ]);
+    }
+
     public function subscription()
     {
         $user = Auth::user();
@@ -90,7 +108,8 @@ class MusicController extends Controller
                 'artist' => $formattedArtist ?? '',
                 'year' => $year ?? '',
             ],
-            'subscriptions' => $subscriptions,
+            // 'subscriptions' => $subscriptions,
+            'subscriptions_list' => $subscriptions,
             'user' => $user->name ?? $user->email,
         ]);
     }

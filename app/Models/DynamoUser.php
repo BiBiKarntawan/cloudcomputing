@@ -125,7 +125,6 @@ class DynamoUser implements Authenticatable
             $client = DynamoUser::getDynamoDbClient();
             $marshaler = new Marshaler();
 
-            // Step 1: Get the current subscriptions
             $result = $client->getItem([
                 'TableName' => 'login',
                 'Key' => $marshaler->marshalItem(['email' => $email]),
@@ -138,23 +137,21 @@ class DynamoUser implements Authenticatable
             $user = $marshaler->unmarshalItem($result['Item']);
             $subscriptions = $user['subscriptions'] ?? [];
 
-            // Step 2: Filter out the item to remove
             $updatedSubscriptions = array_filter($subscriptions, function ($sub) use ($title, $album) {
                 return !($sub['title'] === $title && $sub['album'] === $album);
             });
 
-            // Step 3: Update the DynamoDB item
             $client->updateItem([
                 'TableName' => 'login',
                 'Key' => $marshaler->marshalItem(['email' => $email]),
                 'UpdateExpression' => 'SET subscriptions = :subs',
                 'ExpressionAttributeValues' => $marshaler->marshalItem([
-                    ':subs' => array_values($updatedSubscriptions) // Reindex array
+                    ':subs' => array_values($updatedSubscriptions) 
                 ]),
             ]);
         } catch (Exception $e) {
             return false;
-            //return $e->getMessage();
+
         }
 
         return true;
@@ -165,7 +162,7 @@ class DynamoUser implements Authenticatable
         $marshaler = new Marshaler();
 
         $tableName = 'login';
-        $email = auth()->user()->email; // identify user
+        $email = auth()->user()->email; 
 
         $newSubscription = [
             'title' => $song['title'],
@@ -176,7 +173,6 @@ class DynamoUser implements Authenticatable
         ];
 
         try {
-            // 1. Fetch user
             $result = $client->getItem([
                 'TableName' => $tableName,
                 'Key' => $marshaler->marshalItem([
@@ -193,7 +189,6 @@ class DynamoUser implements Authenticatable
             $userData = $marshaler->unmarshalItem($item);
             $subscriptions = $userData['subscriptions'] ?? [];
 
-            // 2. Check for duplicates by title + album
             $exists = collect($subscriptions)->contains(function ($sub) use ($newSubscription) {
                 return $sub['title'] === $newSubscription['title'] &&
                     $sub['album'] === $newSubscription['album'];
@@ -201,13 +196,11 @@ class DynamoUser implements Authenticatable
 
             if ($exists) {
                 logger()->info('Duplicate subscription not added.');
-                return; // or throw, or just exit quietly
+                return; 
             }
 
-            // 3. Append new subscription
             $subscriptions[] = $newSubscription;
 
-            // 4. Save to DynamoDB
             $client->updateItem([
                 'TableName' => $tableName,
                 'Key' => $marshaler->marshalItem([

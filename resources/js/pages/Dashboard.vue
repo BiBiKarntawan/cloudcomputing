@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Auth, type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 import { Search } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -14,9 +14,18 @@ interface Props {
     email: string;
     subscriptions: string[];
     music: MusicItem[];
+    subscriptions_list: SubscriptionItem[];
 }
 
 export interface MusicItem {
+    title: string;
+    artist: string;
+    album: string;
+    year?: number;
+    img_url?: string;
+}
+
+interface SubscriptionItem {
     title: string;
     artist: string;
     album: string;
@@ -68,6 +77,7 @@ const subscribe = (song: MusicItem) => {
             console.log(response);
 
             alert('Subscribe successfully.');
+            router.get(route('dashboard'));
         })
         .catch((error) => {
             console.error('Subscribe error:', error);
@@ -103,17 +113,76 @@ const checkInput = () => {
     }
     isSubmitAllowed.value = false;
 };
+
 const submit = () => {
     form.get(route('query'), {});
+};
+
+const unsubscribe = (song: MusicItem) => {
+    //alert(song.title)
+
+    const data = {
+        title: song.title,
+        album: song.album,
+        year: song.year,
+        img_url: song.img_url,
+        artist: song.artist,
+        email: props.auth.user.email,
+    };
+
+    // router.post('/unsubscribe', data);
+
+    axios
+        .put(
+            'https://a2vwrk4t8f.execute-api.us-east-1.amazonaws.com/default/myMusicLambdaFunction/unsubscribe',
+            data, // Gets the current data
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+            },
+        )
+        .then((response) => {
+            //subscribe
+            console.log(response);
+
+            alert('Unsubscribe successfully.');
+            router.get(route('dashboard'));
+        })
+        .catch((error) => {
+            console.error('Unsubscribe error:', error);
+            alert('Unsubscribe error.');
+        });
 };
 </script>
 
 <template>
     <Head title="Dashboard" />
     <AppLayout>
-        <div class="p-4">
+        <div class="bg-yellow-300 p-4">
             <!-- <h1 class="ext-2xl font-bold">Welcome, {{ props.user }}</h1> -->
             <h1 class="mb-4 text-2xl font-bold">Discoveries</h1>
+            <div class="mb-6 rounded-lg bg-yellow-300 p-6 shadow-lg">
+                <h1 class="mb-4 text-3xl font-semibold">Manage your subscriptions</h1>
+
+                <div v-if="props.subscriptions_list && props.subscriptions_list.length > 0" class="grid gap-4 md:grid-cols-3">
+                    <div v-for="(item, index) in props.subscriptions_list" :key="index" class="rounded-xl border bg-white p-4 shadow">
+                        <img v-if="item.img_url" :src="item.img_url" alt="Cover" class="mb-2 h-40 w-full rounded object-cover" />
+                        <h2 class="font-semibold">{{ item.title }}</h2>
+                        <p class="text-sm text-gray-600">{{ item.artist }}</p>
+                        <p class="text-sm text-gray-500">{{ item.album }} ({{ item.year }})</p>
+                        <button
+                            @click="() => unsubscribe(item)"
+                            class="mt-2 rounded bg-yellow-300 px-3 py-1 font-semibold text-black hover:bg-yellow-400"
+                        >
+                            Unsubscribe
+                        </button>
+                    </div>
+                </div>
+
+                <div v-else class="text-gray-500">You don't have any subscriptions yet.</div>
+            </div>
             <div class="mb-6 rounded-lg p-6 shadow-lg">
                 <div>
                     <h1 class="mb-3 text-3xl font-semibold">Search Your Favorite Music</h1>
@@ -126,7 +195,7 @@ const submit = () => {
                         <Input @change="checkInput" id="album" type="text" autofocus :tabindex="1" placeholder="Album" v-model="form.album" />
                     </div>
                     <div class="flex">
-                        <Button type="submit" class="ml-auto mt-4" :tabindex="4" :disabled="!isSubmitAllowed">
+                        <Button type="submit" class="ml-auto mt-4 font-semibold" :tabindex="4" :disabled="!isSubmitAllowed">
                             <Search />
                             Search
                         </Button>
@@ -139,12 +208,14 @@ const submit = () => {
             </div>
 
             <div class="grid gap-4 md:grid-cols-3">
-                <div v-for="(song, index) in props.music" :key="index" class="rounded-xl border p-4 shadow">
+                <div v-for="(song, index) in props.music" :key="index" class="rounded-xl border bg-white p-4 shadow">
                     <img v-if="song.img_url" :src="song.img_url" alt="Cover" class="mb-2 h-40 w-full rounded object-cover" />
                     <h2 class="font-semibold">{{ song.title }}</h2>
                     <p class="text-sm text-gray-600">{{ song.artist }}</p>
                     <p class="text-sm text-gray-500">{{ song.album }} ({{ song.year }})</p>
-                    <button @click="() => subscribe(song)" class="mt-2 rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700">Subscribe</button>
+                    <button @click="() => subscribe(song)" class="mt-2 rounded bg-yellow-300 px-3 py-1 font-semibold text-black hover:bg-yellow-400">
+                        Subscribe
+                    </button>
                 </div>
             </div>
         </div>

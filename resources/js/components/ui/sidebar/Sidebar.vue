@@ -27,9 +27,10 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 </script>
 
 <template>
+<div class="bg-yellow-300">
     <div
         v-if="collapsible === 'none'"
-        :class="cn('flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground', props.class)"
+        :class="cn('flex h-full w-[--sidebar-width] flex-col bg-yellow-300 bg-sidebar text-sidebar-foreground', props.class)"
         v-bind="$attrs"
     >
         <slot />
@@ -96,4 +97,5 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
             </div>
         </div>
     </div>
+</div>
 </template>

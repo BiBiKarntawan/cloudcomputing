@@ -16,6 +16,8 @@ class DashboardController extends Controller
 
         $dynamoUser = DynamoUser::findByEmail($user->email);
         $music = DynamoMusic::showAllMusic();
+
+        $subscriptions = $dynamoUser->subscriptions ?? [];
         
         return Inertia::render('Dashboard',[
             'auth' => [
@@ -24,6 +26,7 @@ class DashboardController extends Controller
             'user' => $user->user_name,
             'email' => $user->email,
             'music' => $music,
+            'subscriptions_list' => $subscriptions,
         ]);
     }
     

@@ -18,7 +18,6 @@ interface Props {
     user: string;
     email: string;
     subscriptions: SubscriptionItem[];
-    // user: User;
 }
 
 const props = defineProps<Props>();
