@@ -166,7 +166,68 @@ class DynamoMusic
 
         $client = self::getDynamoDbClient();
         $marshaler = new Marshaler();
+
+        if ($artist !== null) {
+            return self::queryMusicByArtist($client, $marshaler, $artist, $title, $album, $year);
+        } else {
+            return self::scanMusic($client, $marshaler, $title, $album, $year);
+        }
+    }
+
+    private static function queryMusicByArtist($client, $marshaler, $title = null, $album = null, $year = null)
+    {
+        $keyConditionExpression = 'artist = :artist';
+        $expressionAttributeValues = [':artist' => ['S' => $artist]];
+        $expressionAttributeNames = [];
+        $filterExpressions = [];
+
+        if ($title !== null) {
+            $filterExpressions[] = 'contains(title, :title)';
+            $expressionAttributeValues[':title'] = ['S' => $title];
+        }
         
+        if ($album !== null) {
+            $filterExpressions[] = 'contains(album, :album)';
+            $expressionAttributeValues[':album'] = ['S' => $album];
+        }
+        
+        if ($year !== null) {
+            $filterExpressions[] = 'contains(#year, :year)';
+            $expressionAttributeNames['#year'] = 'year';
+            $expressionAttributeValues[':year'] = ['S' => $year];
+        }
+
+        $params = [
+            'TableName' => 'music',
+            'IndexName' => 'artist_index',
+            'KeyConditionExpression' => $keyConditionExpression,
+            'ExpressionAttributeValues' => $expressionAttributeValues
+        ];
+        
+        if (!empty($filterExpressions)) {
+            $params['FilterExpression'] = implode(' AND ', $filterExpressions);
+            
+            if (!empty($expressionAttributeNames)) {
+                $params['ExpressionAttributeNames'] = $expressionAttributeNames;
+            }
+        }
+        
+        try {
+            $result = $client->query($params);
+            
+            $items = [];
+            foreach ($result['Items'] as $item) {
+                $items[] = $marshaler->unmarshalItem($item);
+            }
+            
+            return $items;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    private static function scanMusic($client, $marshaler, $title = null, $album = null, $year = null)
+    {
         $filterExpressions = [];
         $expressionAttributeValues = [];
         $expressionAttributeNames = [];
