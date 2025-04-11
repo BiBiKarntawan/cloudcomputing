@@ -158,7 +158,7 @@ const unsubscribe = (song: MusicItem) => {
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Music Now" />
     <AppLayout>
         <div class="bg-yellow-300 p-4">
             <!-- <h1 class="ext-2xl font-bold">Welcome, {{ props.user }}</h1> -->
