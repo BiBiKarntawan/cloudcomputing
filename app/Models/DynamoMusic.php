@@ -168,13 +168,19 @@ class DynamoMusic
         $marshaler = new Marshaler();
 
         if ($artist !== null) {
-            return self::queryMusicByArtist($client, $marshaler, $artist, $title, $album, $year);
+            $queryResult = self::queryMusicByArtist($client, $marshaler, $artist, $title, $album, $year);
+            
+            if (!empty($queryResult)) {
+                return $queryResult;
+            } else {
+                return self::scanMusic($client, $marshaler, $title, $album, $artist, $year);
+            }
         } else {
-            return self::scanMusic($client, $marshaler, $title, $album, $year);
+            return self::scanMusic($client, $marshaler, $title, $album, $artist, $year);
         }
     }
 
-    private static function queryMusicByArtist($client, $marshaler, $title = null, $album = null, $year = null)
+    private static function queryMusicByArtist($client, $marshaler, $artist, $title = null, $album = null, $year = null)    
     {
         $keyConditionExpression = 'artist = :artist';
         $expressionAttributeValues = [':artist' => ['S' => $artist]];
@@ -226,7 +232,7 @@ class DynamoMusic
         }
     }
 
-    private static function scanMusic($client, $marshaler, $title = null, $album = null, $year = null)
+    private static function scanMusic($client, $marshaler, $title = null, $album = null, $artist = null, $year = null)
     {
         $filterExpressions = [];
         $expressionAttributeValues = [];
