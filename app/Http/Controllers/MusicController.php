@@ -26,7 +26,7 @@ class MusicController extends Controller
             ],            
             'user' => $user->user_name,
             'email' => $user->email,
-            'music' => $music,
+            'music' => [],
             'subscriptions_list' => $subscriptions,
         ]);
     }

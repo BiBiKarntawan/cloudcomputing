@@ -6,7 +6,7 @@ import { Auth, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 import { Search } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 interface Props {
     auth: Auth;
@@ -41,6 +41,14 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
 ];
+
+onMounted(() => {
+    // alert('no log in');
+    const login = localStorage.getItem('login');
+    if (!login) {
+        router.get(route('login'));
+    }
+});
 
 const subscribe = (song: MusicItem) => {
     const data = {

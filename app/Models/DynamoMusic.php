@@ -167,16 +167,78 @@ class DynamoMusic
         $client = self::getDynamoDbClient();
         $marshaler = new Marshaler();
 
-        if ($artist !== null) {
+        if ($title !== null) {
+            $queryResult = self::queryMusicByTitle($client, $marshaler, $title, $artist, $album, $year);
+            
+            if (!empty($queryResult)) {
+                return $queryResult;
+            
+            } else {
+                return self::scanMusic($client, $marshaler, $title, $album, $artist, $year);
+            }
+        
+        } else if ($artist !== null) {
             $queryResult = self::queryMusicByArtist($client, $marshaler, $artist, $title, $album, $year);
             
             if (!empty($queryResult)) {
                 return $queryResult;
+            
             } else {
                 return self::scanMusic($client, $marshaler, $title, $album, $artist, $year);
             }
         } else {
             return self::scanMusic($client, $marshaler, $title, $album, $artist, $year);
+        }
+    }
+
+    private static function queryMusicByTitle($client, $marshaler, $title, $artist = null, $album = null, $year = null)    
+    {
+        $keyConditionExpression = 'title = :title';
+        $expressionAttributeValues = [':title' => ['S' => $title]];
+        $expressionAttributeNames = [];
+        $filterExpressions = [];
+
+        if ($artist !== null) {
+            $filterExpressions[] = 'contains(artist, :artist)';
+            $expressionAttributeValues[':artist'] = ['S' => $artist];
+        }
+        
+        if ($album !== null) {
+            $filterExpressions[] = 'contains(album, :album)';
+            $expressionAttributeValues[':album'] = ['S' => $album];
+        }
+        
+        if ($year !== null) {
+            $filterExpressions[] = 'contains(#year, :year)';
+            $expressionAttributeNames['#year'] = 'year';
+            $expressionAttributeValues[':year'] = ['S' => $year];
+        }
+
+        $params = [
+            'TableName' => 'music',
+            'KeyConditionExpression' => $keyConditionExpression,
+            'ExpressionAttributeValues' => $expressionAttributeValues
+        ];
+        
+        if (!empty($filterExpressions)) {
+            $params['FilterExpression'] = implode(' AND ', $filterExpressions);
+            
+            if (!empty($expressionAttributeNames)) {
+                $params['ExpressionAttributeNames'] = $expressionAttributeNames;
+            }
+        }
+        
+        try {
+            $result = $client->query($params);
+            
+            $items = [];
+            foreach ($result['Items'] as $item) {
+                $items[] = $marshaler->unmarshalItem($item);
+            }
+            
+            return $items;
+        } catch (Exception $e) {
+            return false;
         }
     }
 

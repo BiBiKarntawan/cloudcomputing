@@ -2,14 +2,20 @@
 import UserInfo from '@/components/UserInfo.vue';
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import type { User } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import { LogOut } from 'lucide-vue-next';
+import Button from './ui/button/Button.vue';
 
 interface Props {
     user: User;
 }
 
 defineProps<Props>();
+
+const handleLogout = () => {
+    localStorage.removeItem('login');
+    router.post(route('logout'));
+};
 </script>
 
 <template>
@@ -22,9 +28,9 @@ defineProps<Props>();
 
     <DropdownMenuSeparator />
     <DropdownMenuItem :as-child="true">
-        <Link class="block w-full" method="post" :href="route('logout')" as="button">
+        <Button class="flex w-full" @click="handleLogout" type="button">
             <LogOut class="mr-2 h-4 w-4" />
             Log out
-        </Link>
+        </Button>
     </DropdownMenuItem>
 </template>
